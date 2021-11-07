@@ -8,8 +8,8 @@ import { AppProvider } from "./Provider";
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
-      <ColorModeScript />
       <AppProvider>
+        <ColorModeScript />
         <App />
       </AppProvider>
     </BrowserRouter>

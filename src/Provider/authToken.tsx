@@ -12,26 +12,23 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-interface User {
-  email: string;
-  id: string;
-  name: string;
-}
-
 interface AuthState {
   accessToken: string;
-  user: User;
+  user: string;
 }
 
 interface SingInCredentials {
   email: string;
   password: string;
 }
+
 interface AuthContextData {
-  user: User;
+  user: string;
   accessToken: string;
   signIn: ({ email, password }: SingInCredentials) => Promise<void>;
+  signOut: () => void;
 }
+
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 const useAuth = () => {
@@ -43,28 +40,40 @@ const useAuth = () => {
 };
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [data, seteData] = useState<AuthState>(() => {
+  const [data, setData] = useState<AuthState>(() => {
     const accessToken = localStorage.getItem("@HamburgueriaKenzie:accessToken");
     const user = localStorage.getItem("@HamburgueriaKenzie:user");
 
     if (accessToken && user) {
-      return { accessToken, user: JSON.parse(user) };
+      return { accessToken, user: user };
     }
 
     return {} as AuthState;
   });
+
   const signIn = useCallback(async ({ email, password }: SingInCredentials) => {
     const response = await api.post("/login", { email, password });
 
     const { accessToken, user } = response.data;
 
     localStorage.setItem("@HamburgueriaKenzie:accessToken", accessToken);
-    localStorage.setItem("@HamburgueriaKenzie:user", user);
-    seteData({ accessToken, user });
+    localStorage.setItem("@HamburgueriaKenzie:user", user.id);
+    setData({ accessToken, user });
+  }, []);
+
+  const signOut = useCallback(() => {
+    localStorage.removeItem("@HamburgueriaKenzie:accessToken");
+    localStorage.removeItem("@HamburgueriaKenzie:user");
+    setData({} as AuthState);
   }, []);
   return (
     <AuthContext.Provider
-      value={{ accessToken: data.accessToken, user: data.user, signIn }}
+      value={{
+        accessToken: data.accessToken,
+        user: data.user,
+        signIn,
+        signOut,
+      }}
     >
       {children}
     </AuthContext.Provider>

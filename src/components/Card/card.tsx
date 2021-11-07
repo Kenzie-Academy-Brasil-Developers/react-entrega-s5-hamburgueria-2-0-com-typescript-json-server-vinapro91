@@ -1,9 +1,11 @@
+import { Image } from "@chakra-ui/image";
+import { Box, Flex } from "@chakra-ui/layout";
 import React from "react";
 interface CardProps {
-  name: string;
-  category: string;
-  image: string;
-  price: number;
+  name?: string;
+  category?: string;
+  image?: string;
+  price?: string;
   userId?: number;
   id?: number;
 }
@@ -16,11 +18,13 @@ export const Card = ({
   id,
 }: CardProps) => {
   return (
-    <div>
+    <Flex justifyContent="center" flexDirection="column" alignItems="center">
       <p>{name}</p>
       <p>{category}</p>
-      <p>{image}</p>
+      <Box>
+        <Image alt={name} src={image} boxSize="150px" objectFit="cover" />
+      </Box>
       <p>{price}</p>
-    </div>
+    </Flex>
   );
 };
